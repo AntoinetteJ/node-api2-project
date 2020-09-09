@@ -35,23 +35,12 @@ server.post('/api/posts', (req, res) => {
 server.post('/api/posts/:id/comments', (req, res) => {
     const {id} = req.params;
     const newComment = req.body;
-    newComment.id = id;
+    newComment.post_id = id;
     console.log(newComment)
     
-        let index = posts.findIndex( post => post.id === id);
-        if(index !== -1){
-            posts[index] = newComment;
-            res.status(201).json(posts[index]);
-        } else if(newComment.text === ""){
-            res.status(400).json({errorMessage: "Please provide text for the comment." })
-        }
-        if (newComment.comment) {
-            posts.push(newComment)
-            res.status(201).json({Created})
-            console.log(newComment.comment)
-        } else{
-            res.status(500).json({ error: "There was an error while saving the comment to the database" })
-        }
+    post.insertComment(newComment){
+        res.status(201).json
+    }
     })
  
 server.get('/api/posts', (req, res) => {
