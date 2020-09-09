@@ -1,7 +1,7 @@
 const express = require("express");
-const Blog = require("../node-api2-project/data/db")
+// const Blog = require("../node-api2-project/data/db")
 const server = express();
-
+const posts = require('./data/db.js')
 server.use(express.json());
 
 const PORT  = 5000;
@@ -18,17 +18,42 @@ server.get('/', (req, res) => {
 server.post('/api/posts', (req, res) => {
     const newPost = req.body;
     console.log(newPost);
-    
-    res.status(200).json(newPost);
-})
+    try {
+        if(postInfo.title && postInfo.content){
+            shortid = shortid.generate();
+            posts.push(postInfo);
+            res.status(201).json(postInfo)
+        } else {
+            res.status(400).json({errorMessage: "Please provide title and content for the post"})
+        }
+        }
+    catch(err){
+        res.status(500).json({errorMessage: "There was an error while saving the post to the database"})
+    }
+ })
 
 server.post('/api/posts/:id/comments', (req, res) => {
-    const db = req.body;
-    console.log(db);
+    const {id} = req.params;
     const newComment = req.body;
-    res.status(200).json(newComment);
-})
-
+    newComment.id = id;
+    console.log(newComment)
+    
+        let index = posts.findIndex( post => post.id === id);
+        if(index !== -1){
+            posts[index] = newComment;
+            res.status(201).json(posts[index]);
+        } else if(newComment.text === ""){
+            res.status(400).json({errorMessage: "Please provide text for the comment." })
+        }
+        if (newComment.comment) {
+            posts.push(newComment)
+            res.status(201).json({Created})
+            console.log(newComment.comment)
+        } else{
+            res.status(500).json({ error: "There was an error while saving the comment to the database" })
+        }
+    })
+ 
 server.get('/api/posts', (req, res) => {
     Blog.find(req.query)
     .then(blog => {
